@@ -1,4 +1,4 @@
-import { addTrack, findShortUrl } from "@/lib/api";
+import { addTrack, findShortUrl } from "@/app/api/api_url";
 import { redirect } from "next/navigation";
 import PasswordProtection from "./passwordprotection";
 async function SlugPage({ params }: { params: Promise<{ slug: string }> }) {

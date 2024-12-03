@@ -10,7 +10,7 @@ import { Button } from "./ui/button";
 import { Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { QRCodeSVG } from "qrcode.react";
-import { getTinyUrl, checkSlugAvailability } from "@/lib/api";
+import { getTinyUrl, checkSlugAvailability } from "@/app/api/api_url";
 import { Toaster } from "./ui/toaster";
 
 const initialState = {

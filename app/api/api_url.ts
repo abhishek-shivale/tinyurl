@@ -1,10 +1,21 @@
 "use server";
-import bcrypt from "bcrypt";
-import { generateSlug, UrlFormData } from "./lib";
-import prisma from "./prisma";
 import { ShortUrl } from "@prisma/client";
+import bcrypt from "bcrypt";
+import { headers } from "next/headers";
+import { generateSlug, UrlFormData } from "../../lib/lib";
+import prisma from "../../lib/prisma";
 export async function getTinyUrl(data: UrlFormData) {
   const { url, customSlug, password, expireAt } = data;
+
+  const userId = (await headers()).get("x-userid");
+
+  if (!userId) {
+    return {
+      message: "Unauthorized",
+      shortUrl: { slug: "" },
+      success: false,
+    };
+  }
 
   try {
     const slug = customSlug || generateSlug();
@@ -20,12 +31,15 @@ export async function getTinyUrl(data: UrlFormData) {
       }
     }
 
+    console.log(userId)
+
     const shortUrl = await prisma.shortUrl.create({
       data: {
         originalUrl: url,
         slug,
         password: password ? await bcrypt.hash(password, 10) : null,
         expiresAt: expireAt ? new Date(expireAt) : null,
+        userId: userId,
       },
     });
 

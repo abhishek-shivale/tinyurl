@@ -12,6 +12,23 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+enum LoginType {
+  GOOGLE
+  CREDENTIAL
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String    @unique
+  password      String?
+  profileImage  String?   
+  loginType     LoginType
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  isVerified    Boolean   @default(false)
+  shortUrls     ShortUrl[]
+}
 
 model ShortUrl {
   id            String    @id @default(cuid())
@@ -19,9 +36,11 @@ model ShortUrl {
   slug          String    @unique
   createdAt     DateTime  @default(now())
   clicks        Int       @default(0)
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String
   password      String?
   expiresAt     DateTime?
   lastClickedAt DateTime?
 
-  @@index([slug])
+  @@index([slug], name: "idx_slug")
 }
