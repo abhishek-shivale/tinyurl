@@ -63,7 +63,7 @@ function TinyLinkForm() {
     } else {
       setState((prev) => ({ ...prev, slugStatus: "" }));
     }
-  }, [customSlug]);
+  }, []);
 
   const onSubmit = async (data: UrlFormData) => {
     try {

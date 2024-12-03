@@ -1,10 +1,10 @@
-import NextAuth, { NextAuthConfig } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare, hash } from "bcrypt";
 import prisma from "@/lib/prisma";
 
-const authOptions:NextAuthConfig = {
+const authOptions:NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -180,11 +180,9 @@ const authOptions:NextAuthConfig = {
     signIn: "/login",
     newUser: "/register",
   },
-};
+} satisfies NextAuthOptions;
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
+
