@@ -4,9 +4,9 @@ import bcrypt from "bcrypt";
 import { headers } from "next/headers";
 import { generateSlug, UrlFormData } from "../../lib/lib";
 import prisma from "../../lib/prisma";
-export async function getTinyUrl(data: UrlFormData) {
-  const { url, customSlug, password, expireAt } = data;
+import { revalidatePath } from "next/cache";
 
+export const checkUser = async () => {
   const userId = (await headers()).get("x-userid");
 
   if (!userId) {
@@ -16,6 +16,12 @@ export async function getTinyUrl(data: UrlFormData) {
       success: false,
     };
   }
+  return userId;
+};
+export async function getTinyUrl(data: UrlFormData) {
+  const { url, customSlug, password, expireAt } = data;
+
+  const userId = await checkUser();
 
   try {
     const slug = customSlug || generateSlug();
@@ -31,7 +37,31 @@ export async function getTinyUrl(data: UrlFormData) {
       }
     }
 
-    console.log(userId)
+    const user = await prisma.user.findUnique({
+      where: { id: userId as string },
+      select: {
+        _count: {
+          select: {
+            shortUrls: true,
+          },
+        },
+      },
+    });
+    if (!user) {
+      return {
+        message: "User not found",
+        shortUrl: { slug: "" },
+        success: false,
+      };
+    }
+
+    if (user?._count?.shortUrls === 15 || user?._count?.shortUrls > 15) {
+      return {
+        message: "You have reached the limit, upgrade your plan.",
+        shortUrl: { slug: "" },
+        success: false,
+      };
+    }
 
     const shortUrl = await prisma.shortUrl.create({
       data: {
@@ -39,10 +69,10 @@ export async function getTinyUrl(data: UrlFormData) {
         slug,
         password: password ? await bcrypt.hash(password, 10) : null,
         expiresAt: expireAt ? new Date(expireAt) : null,
-        userId: userId,
+        userId: userId as string,
       },
     });
-
+    revalidatePath("/dashboard");
     return {
       message: "Short URL created successfully",
       shortUrl: { slug: shortUrl.slug },
@@ -122,4 +152,49 @@ export const checkSlugAvailability = async (slug: string) => {
     },
   });
   return !shortUrl;
+};
+
+export const getShortUrl = async () => {
+  const userId = await checkUser();
+  if (!userId) throw new Error("Unauthorized");
+
+  const shortUrls = await prisma.shortUrl.findMany({
+    where: {
+      userId: userId as string,
+    },
+    select: {
+      clicks: true,
+      originalUrl: true,
+      slug: true,
+      id: true,
+      createdAt: true,
+      password: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const urls = shortUrls.map((url) => ({
+    ...url,
+    isProtected: url.password ? true : false,
+    password: undefined,
+  }));
+
+  return urls;
+};
+
+export const deleteShortUrl = async (id: string) => {
+  if (!id)  throw new Error("id not found");
+  const res = await prisma.shortUrl.delete({
+    where: {
+      id: id,
+    },
+    select: {
+      id: true,
+    },
+  });
+  if (!res) throw new Error("Delete failed");
+  revalidatePath("/dashboard");
+  return {message: "Deleted successfully", success: true};
 };

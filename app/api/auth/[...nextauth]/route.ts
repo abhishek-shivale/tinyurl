@@ -4,13 +4,12 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { compare, hash } from "bcrypt";
 import prisma from "@/lib/prisma";
 
-const authOptions:NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       profile(profile) {
-        // console.log("hgh",profile);
         return {
           id: profile.sub,
           name: profile.name,
@@ -102,8 +101,7 @@ const authOptions:NextAuthOptions = {
     async signIn({ account, profile }) {
       if (!account) return false;
 
-      if (account.provider === "google") {
-
+      if (account.provider === "GOOGLE") {
         if (!profile) return false;
 
         const existingUser = await prisma.user.findUnique({
@@ -112,12 +110,13 @@ const authOptions:NextAuthOptions = {
           },
         });
 
-
         if (!existingUser) {
           await prisma.user.create({
             data: {
               email: profile.email as string,
-              profileImage: profile.image as string ?? (profile as { picture: string }).picture as string,
+              profileImage:
+                (profile.image as string) ??
+                ((profile as { picture: string }).picture as string),
               loginType: "GOOGLE",
               isVerified: true,
               name: profile.name,
@@ -144,21 +143,41 @@ const authOptions:NextAuthOptions = {
         where: {
           email: token.email as string,
         },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          isVerified: true,
+          _count: true,
+        },
       });
 
       if (getUserdetails) {
         token.id = getUserdetails.id;
         token.email = getUserdetails.email;
+        token.role = getUserdetails.role;
+        token.isVerified = getUserdetails.isVerified;
+        token.link = getUserdetails?._count.shortUrls;
       }
 
-      if (!user && account?.provider === "google" && profile?.email) {
+      if (!user && account?.provider === "GOOGLE" && profile?.email) {
         const existingUser = prisma.user.findUnique({
           where: { email: profile.email as string },
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            isVerified: true,
+            _count: true,
+          },
         });
 
         if (existingUser) {
           token.id = (await existingUser)?.id as string;
           token.email = (await existingUser)?.email;
+          token.role = (await existingUser)?.role;
+          token.isVerified = (await existingUser)?.isVerified;
+          token.link = (await existingUser)?._count.shortUrls;
         }
       }
 
@@ -168,7 +187,9 @@ const authOptions:NextAuthOptions = {
       if (token) {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
-       // add more info
+        session.user.role = token.role as string;
+        session.user.isVerified = token.isVerified as boolean;
+        session.user.link = token.link as number;
       }
       return session;
     },
@@ -185,4 +206,3 @@ const authOptions:NextAuthOptions = {
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
-

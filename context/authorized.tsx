@@ -1,14 +1,30 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import React, { createContext } from "react";
-import type { Session } from "next-auth";
+import { getUserInfo } from "@/app/api/api_user";
+
+interface AuthorizedContext {
+  email: string;
+  id: string;
+  isVerified: boolean;
+  name: string | null;
+  profileImage: string | null;
+  role: string;
+  _count: {
+    shortUrls: number;
+  };
+}
+
 const AuthorizedContext = createContext<{
-  data: Session | null;
-  update: () => void;
+  info: AuthorizedContext | null;
+  setInfo: React.Dispatch<React.SetStateAction<AuthorizedContext | null>>;
+  clearUserInfo: () => void;
+  revalidateUserInfo: () => Promise<void>;
 }>({
-  data: null,
-  update: () => {},
+  info: null,
+  setInfo: () => {},
+  clearUserInfo: () => {},
+  revalidateUserInfo: async () => {},
 });
 
 function AuthorizedContextProvider({
@@ -16,23 +32,44 @@ function AuthorizedContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const { data, update } = useSession();
-  const user = data?.user;
+  const [info, setInfo] = React.useState<AuthorizedContext | null>(() => {
+    const storedInfo = localStorage.getItem("userInfo");
+    return storedInfo ? JSON.parse(storedInfo) : null;
+  });
 
-  const sessionData: Session | null = user
-    ? {
-        ...data,
-        user: {
-          id: user.id!,
-          name: user.name,
-          email: user.email,
-          image: user.image,
-        },
-      }
-    : null;
+  const fetchUserInfo = async () => {
+    try {
+      const res = await getUserInfo();
+      const userInfo = res as AuthorizedContext;
+
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+      setInfo(userInfo);
+    } catch (error) {
+      console.error("Failed to fetch user info:", error);
+    }
+  };
+
+  React.useEffect(() => {
+    if (!info) {
+      fetchUserInfo();
+    }
+  }, [info]);
+
+  function clearUserInfo() {
+    localStorage.removeItem("userInfo");
+    setInfo(null);
+  }
+
+  const revalidateUserInfo = async () => {
+    await fetchUserInfo();
+  };
+
+  if (!info) return null;
 
   return (
-    <AuthorizedContext.Provider value={{ data: sessionData, update }}>
+    <AuthorizedContext.Provider
+      value={{ info, setInfo, clearUserInfo, revalidateUserInfo }}
+    >
       {children}
     </AuthorizedContext.Provider>
   );

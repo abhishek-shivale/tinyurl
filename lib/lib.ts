@@ -17,3 +17,15 @@ export const generateSlug = () => {
   }
   return slug
 }
+
+export const getRelativeDate = (date: Date) => {
+  const now = new Date();
+  const timeDiff = now.getTime() - new Date(date).getTime();
+  const daysAgo = Math.floor(timeDiff / (1000 * 3600 * 24));
+
+  if (daysAgo === 1) return '1 day ago';
+  if (daysAgo === 2) return '2 days ago';
+  if (daysAgo < 1) return 'Today';
+  return `${daysAgo} days ago`;
+};
+

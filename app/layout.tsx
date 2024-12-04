@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { ToastProvider } from "@/components/ui/toast";
-import { fontParagraph } from "./font";
 import SessionProviderWrapper from "@/components/session/sessionprovider";
+import { ToastProvider } from "@/components/ui/toast";
+import type { Metadata } from "next";
+import { fontParagraph } from "./font";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "TinyLink",
@@ -18,7 +18,9 @@ export default function RootLayout({
     <SessionProviderWrapper>
       <html lang="en">
         <body className={` ${fontParagraph} antialiased`}>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            {children}
+            </ToastProvider>
         </body>
       </html>
     </SessionProviderWrapper>

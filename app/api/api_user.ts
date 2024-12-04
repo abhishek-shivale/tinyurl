@@ -7,6 +7,21 @@ export async function getUserInfo() {
 
   if (!userId) return;
 
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      _count: {
+        select: {
+          shortUrls: true,
+        },
+      },
+      profileImage: true,
+      role: true,
+      isVerified: true,
+      name: true,
+    },
+  });
   return user;
 }
