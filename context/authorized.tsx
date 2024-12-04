@@ -33,6 +33,9 @@ function AuthorizedContextProvider({
   children: React.ReactNode;
 }) {
   const [info, setInfo] = React.useState<AuthorizedContext | null>(() => {
+    if (!window) {
+      return null;
+    }
     const storedInfo = localStorage.getItem("userInfo");
     return storedInfo ? JSON.parse(storedInfo) : null;
   });

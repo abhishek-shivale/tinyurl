@@ -17,6 +17,8 @@ import { Trash2 } from "lucide-react";
 
 export const DeleteDialog = ({ value }: { value: string }) => {
   const {revalidateUserInfo} = useAuthorizedContext()
+
+  if(!window) return null
   const handleDelete = async () => {
     try {
       await deleteShortUrl(value);
@@ -52,7 +54,7 @@ export const DeleteDialog = ({ value }: { value: string }) => {
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md"
+            className="px-4 py-2 text-white !bg-red-600 !hover:bg-red-700 rounded-md"
           >
             Delete
           </AlertDialogAction>
