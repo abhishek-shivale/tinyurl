@@ -1,9 +1,29 @@
 import { getShortUrl } from "@/app/api/api_url";
 import { getRelativeDate } from "@/lib/lib";
-import { BarChart2, Edit, Lock, Unlock } from "lucide-react";
+import { BarChart2, Edit, Lock, Trash2, Unlock } from "lucide-react";
 import { Qrdialog } from "./actions";
 import Clipboard from "./clipboard";
 import { DeleteDialog } from "@/lib/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { EditDialog } from "./editdialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogHeader,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 async function ShortLinkTable() {
   const links = await getShortUrl();
@@ -88,13 +108,63 @@ async function ShortLinkTable() {
               <td className="px-6 py-4 text-right">
                 <div className="flex justify-end items-center gap-2">
                   <Qrdialog value={`${link.slug}`} />
-                  <button
-                    className="text-gray-400 hover:text-green-600"
-                    title="Edit"
-                  >
-                    <Edit size={20} />
-                  </button>
-                  <DeleteDialog value={link.id} />
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button
+                        className="text-gray-400 hover:text-green-600"
+                        title="Edit"
+                      >
+                        <Edit size={20} />
+                      </button>
+                    </DialogTrigger>
+
+                    <DialogContent className="sm:max-w-[600px]">
+                      <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                          <Edit className="h-5 w-5" />
+                          Edit Short Link
+                        </DialogTitle>
+                        <DialogDescription>
+                          Modify your short link details
+                        </DialogDescription>
+                      </DialogHeader>
+                      <EditDialog
+                        originalUrl={link.originalUrl}
+                        shortUrl={link.slug}
+                        isProtected={link.isProtected}
+                        id={link.id}
+                      />
+                    </DialogContent>
+                  </Dialog>
+
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        className="text-gray-400 hover:!text-red-600"
+                        title="Delete"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirm Delete</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this item? This action
+                          cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                          Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction className="px-4 py-2 text-white !bg-red-600 hover:!bg-red-700 rounded-md">
+                          <DeleteDialog value={link.id} />
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </td>
             </tr>

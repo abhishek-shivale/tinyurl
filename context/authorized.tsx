@@ -1,7 +1,7 @@
 "use client";
-
-import React, { createContext } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { getUserInfo } from "@/app/api/api_user";
+import { toast } from "@/hooks/use-toast";
 
 interface AuthorizedContext {
   email: string;
@@ -19,12 +19,12 @@ const AuthorizedContext = createContext<{
   info: AuthorizedContext | null;
   setInfo: React.Dispatch<React.SetStateAction<AuthorizedContext | null>>;
   clearUserInfo: () => void;
-  revalidateUserInfo: () => Promise<void>;
+  revalidateUserInfo: () => Promise<boolean>;
 }>({
   info: null,
   setInfo: () => {},
   clearUserInfo: () => {},
-  revalidateUserInfo: async () => {},
+  revalidateUserInfo: async () => false,
 });
 
 function AuthorizedContextProvider({
@@ -32,46 +32,59 @@ function AuthorizedContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [info, setInfo] = React.useState<AuthorizedContext | null>(() => {
-    if (!window) {
-      return null;
-    }
-    const storedInfo = localStorage.getItem("userInfo");
-    return storedInfo ? JSON.parse(storedInfo) : null;
-  });
+  const [info, setInfo] = useState<AuthorizedContext | null>(null);
 
-  const fetchUserInfo = async () => {
-    try {
-      const res = await getUserInfo();
-      const userInfo = res as AuthorizedContext;
-
-      localStorage.setItem("userInfo", JSON.stringify(userInfo));
-      setInfo(userInfo);
-    } catch (error) {
-      console.error("Failed to fetch user info:", error);
-    }
-  };
-
-  React.useEffect(() => {
-    if (!info) {
+  useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      setInfo(JSON.parse(userInfo));
+    } else {
+      async function fetchUserInfo() {
+        await revalidateUserInfo();
+      }
       fetchUserInfo();
     }
-  }, [info]);
-
-  function clearUserInfo() {
-    localStorage.removeItem("userInfo");
-    setInfo(null);
-  }
+  }, []);
 
   const revalidateUserInfo = async () => {
-    await fetchUserInfo();
+    try {
+      const userInfo = await getUserInfo();
+      if (userInfo && userInfo.id) {
+        localStorage.setItem("userInfo", JSON.stringify(userInfo));
+        setInfo(userInfo);
+        return true;
+      }
+      toast({
+        title: "Failed to fetch user information",
+        description: "User not found",
+        variant: "destructive",
+      });
+      return false;
+    } catch (error) {
+      if (error instanceof Error) {
+        toast({
+          title: "Failed to fetch user information",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+      return false;
+    }
   };
 
-  if (!info) return null;
+  const clearUserInfo = () => {
+    localStorage.removeItem("userInfo");
+    setInfo(null);
+  };
 
   return (
     <AuthorizedContext.Provider
-      value={{ info, setInfo, clearUserInfo, revalidateUserInfo }}
+      value={{
+        info,
+        setInfo,
+        clearUserInfo,
+        revalidateUserInfo,
+      }}
     >
       {children}
     </AuthorizedContext.Provider>

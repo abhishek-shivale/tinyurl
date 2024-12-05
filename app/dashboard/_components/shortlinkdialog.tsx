@@ -17,10 +17,19 @@ import { useAuthorizedContext } from "@/hooks/use-authorise";
 import { useToast } from "@/hooks/use-toast";
 import { UrlFormData, urlFormSchema } from "@/lib/lib";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Copy, Link as LinkIcon, Plus, Settings, X } from "lucide-react";
+import {
+  Copy,
+  Crown,
+  Link as LinkIcon,
+  Lock,
+  Plus,
+  Settings,
+  X,
+} from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { cn } from "@/lib/utils";
 
 const initialState = {
   shortUrl: "",
@@ -28,6 +37,7 @@ const initialState = {
   slugStatus: "",
   advancedOptionsOpen: false,
   generateQr: false,
+  enablePassword: false,
 };
 
 function ShortLinkDialog() {
@@ -37,12 +47,15 @@ function ShortLinkDialog() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { info, revalidateUserInfo } = useAuthorizedContext();
 
+  const userRole = info?.role || "FREE";
+
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<UrlFormData>({
     resolver: zodResolver(urlFormSchema),
   });
@@ -52,7 +65,7 @@ function ShortLinkDialog() {
   useEffect(() => {
     if (slugTimeout) clearTimeout(slugTimeout);
 
-    if (customSlug) {
+    if (customSlug && userRole === "PREMIUM") {
       setState((prev) => ({ ...prev, slugStatus: "Checking availability..." }));
       const timeout = setTimeout(async () => {
         try {
@@ -76,7 +89,7 @@ function ShortLinkDialog() {
     } else {
       setState((prev) => ({ ...prev, slugStatus: "" }));
     }
-  }, []);
+  }, [customSlug, userRole]);
 
   const toggleAdvancedOptions = () => {
     setState((prev) => ({
@@ -92,6 +105,20 @@ function ShortLinkDialog() {
     }));
   };
 
+  const togglePasswordProtection = () => {
+    setState((prev) => {
+      const newEnablePassword = !prev.enablePassword;
+      // Clear password when disabling
+      if (!newEnablePassword) {
+        setValue("password", "");
+      }
+      return {
+        ...prev,
+        enablePassword: newEnablePassword,
+      };
+    });
+  };
+
   const onSubmit = async (data: UrlFormData) => {
     if (!data) {
       toast({ title: "Please fill all the fields.", variant: "destructive" });
@@ -104,6 +131,15 @@ function ShortLinkDialog() {
       ) {
         toast({
           title: "You have reached the limit, upgrade your plan.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate custom slug for premium users
+      if (data.customSlug && userRole !== "PREMIUM") {
+        toast({
+          title: "Custom slug is a premium feature.",
           variant: "destructive",
         });
         return;
@@ -238,11 +274,39 @@ function ShortLinkDialog() {
           {state.advancedOptionsOpen && (
             <div className="space-y-4 animate-fade-in">
               <div>
-                <Input
-                  {...register("customSlug")}
-                  placeholder="Enter your custom slug (optional)"
-                  className="w-full"
-                />
+                <div className="flex items-center justify-between">
+                  <Label>Custom Slug</Label>
+                  {userRole !== "PREMIUM" && (
+                    <div className="flex items-center text-yellow-600 text-sm py-2">
+                      <Crown className="mr-1 h-4 w-4" />
+                      Premium Feature
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 py-2">
+                  <Input
+                    {...register("customSlug")}
+                    placeholder="Enter your custom slug (optional)"
+                    className={cn(
+                      "w-full",
+                      userRole !== "PREMIUM" && "opacity-50 cursor-not-allowed"
+                    )}
+                    disabled={userRole !== "PREMIUM"}
+                  />
+                  {userRole !== "PREMIUM" && (
+                    <div
+                      className="flex items-center gap-1 text-sm text-muted-foreground"
+                      title="Premium Feature"
+                    >
+                      <Lock className="h-4 w-4" />
+                    </div>
+                  )}
+                </div>
+                {userRole !== "PREMIUM" && (
+                  <p className="my-2 text-sm text-muted-foreground">
+                    Upgrade to Premium to customize your slug
+                  </p>
+                )}
                 {state.slugStatus && (
                   <p
                     className={`mt-1 text-sm ${
@@ -255,14 +319,27 @@ function ShortLinkDialog() {
                   </p>
                 )}
               </div>
-              <div>
-                <Input
-                  {...register("password")}
-                  type="password"
-                  placeholder="Enter your password (optional)"
-                  className="w-full"
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="password-protect"
+                  checked={state.enablePassword}
+                  onCheckedChange={togglePasswordProtection}
                 />
+                <Label htmlFor="password-protect">Password Protection</Label>
               </div>
+
+              {state.enablePassword && (
+                <div>
+                  <Input
+                    {...register("password")}
+                    type="password"
+                    placeholder="Enter your password"
+                    className="w-full"
+                  />
+                </div>
+              )}
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="qr-code"

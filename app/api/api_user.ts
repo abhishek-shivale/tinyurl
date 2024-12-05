@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 export async function getUserInfo() {
   const userId = (await headers()).get("x-userid");
 
-  if (!userId) return;
+  if (!userId) return null;
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -23,5 +23,6 @@ export async function getUserInfo() {
       name: true,
     },
   });
+  console.log(user);
   return user;
 }

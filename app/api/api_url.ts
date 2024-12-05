@@ -185,7 +185,7 @@ export const getShortUrl = async () => {
 };
 
 export const deleteShortUrl = async (id: string) => {
-  if (!id)  throw new Error("id not found");
+  if (!id) throw new Error("id not found");
   const res = await prisma.shortUrl.delete({
     where: {
       id: id,
@@ -196,5 +196,55 @@ export const deleteShortUrl = async (id: string) => {
   });
   if (!res) throw new Error("Delete failed");
   revalidatePath("/dashboard");
-  return {message: "Deleted successfully", success: true};
+  return { message: "Deleted successfully", success: true };
+};
+
+interface editShortUrl {
+  id: string;
+  customSlug?: string | undefined;
+  url?: string | undefined;
+  password?: string | undefined;
+  passwordEnabled?: boolean | undefined;
+}
+export const editShortUrl = async (data: editShortUrl) => {
+  const user = await checkUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const shortUrl = await prisma.shortUrl.update({
+    where: {
+      id: data.id,
+    },
+    data: {
+      ...(data.customSlug && { slug: data.customSlug }),
+      ...(data.url && { originalUrl: data.url }),
+    },
+  });
+
+  if (data.password || data.passwordEnabled) {
+    if (data.password && data.passwordEnabled) {
+      await prisma.shortUrl.update({
+        where: {
+          id: data.id,
+        },
+        data: {
+          password: await bcrypt.hash(data.password, 10),
+        },
+      });
+    }
+  }
+
+  if (data.passwordEnabled == false) {
+    console.log("here");
+    await prisma.shortUrl.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        password: '',
+      },
+    });
+  }
+  if (!shortUrl) throw new Error("Edit failed");
+  revalidatePath("/dashboard");
+  return true;
 };

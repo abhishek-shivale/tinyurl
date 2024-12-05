@@ -1,6 +1,6 @@
 "use client";
 import { useAuthorizedContext } from "@/hooks/use-authorise";
-import { ChartNoAxesColumn, Home, Settings } from "lucide-react";
+import { ChartNoAxesColumn, Crown, Home,  Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar";
@@ -69,15 +69,67 @@ function Sidebarmenu() {
 
 export default Sidebarmenu;
 
-export const LimitUrl = () => {
-  const limit = useAuthorizedContext();
-  console.log(limit);
-  if (!limit) return;
-  return limit?.info?._count?.shortUrls ? (
-    <span className="font-bold text-blue-600">
-      {limit?.info?._count?.shortUrls as number}/15
-    </span>
+export const UserContent = () => {
+  const userInfo = useAuthorizedContext();
+
+  if (!userInfo || !userInfo.info) {
+    return <p className="text-sm text-gray-700">Loading user info...</p>;
+  }
+
+  const { role, _count } = userInfo.info;
+  const shortUrlsCount = _count?.shortUrls ?? 0;
+
+  return role === "FREE" ? (
+    <FreeUserContent shortUrlsCount={shortUrlsCount} />
   ) : (
-    ""
+    <PremiumUserContent />
   );
 };
+
+const FreeUserContent = ({ shortUrlsCount }: { shortUrlsCount: number }) => {
+  const maxLimit = 15; // Example limit for free users
+  const progressPercentage = Math.min((shortUrlsCount / maxLimit) * 100, 100);
+
+  return (
+    <>
+      <div className="flex justify-center mb-2">
+        <Crown className="text-yellow-500" size={32} />
+      </div>
+      <p className="text-sm text-gray-700 mb-2">
+        You&apos;ve used{" "}
+        <span className="font-bold text-red-600">
+          {shortUrlsCount}/{maxLimit}
+        </span>{" "}
+        links
+      </p>
+      <div className="w-full bg-gray-300 rounded-full h-2.5 mb-2">
+        <div
+          className="bg-blue-600 h-2.5 rounded-full transition-all"
+          style={{ width: `${progressPercentage}%` }}
+        ></div>
+      </div>
+      <p className="text-xs text-gray-500 mb-3">
+        Upgrade to create more links and unlock premium features
+      </p>
+      <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
+        Go Pro
+      </button>
+    </>
+  );
+};
+
+const PremiumUserContent = () => (
+  <>
+    <div className="flex justify-center mb-2">
+      <Crown className="text-yellow-500" size={32} />
+    </div>
+    <p className="text-sm text-gray-700 mb-2">
+      <span className="font-bold text-blue-600">Unlimited Links</span> at your
+      disposal!
+    </p>
+    <p className="text-xs text-gray-500 mb-3">Enjoy all the premium benefits!</p>
+    <button className="w-full bg-gray-500 text-white py-2 rounded-md cursor-not-allowed">
+      Premium Activated
+    </button>
+  </>
+);

@@ -3,6 +3,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import type { Metadata } from "next";
 import { fontParagraph } from "./font";
 import "./globals.css";
+import AuthorizedContextProvider from "@/context/authorized";
 
 export const metadata: Metadata = {
   title: "TinyLink",
@@ -15,14 +16,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SessionProviderWrapper>
-      <html lang="en">
-        <body className={` ${fontParagraph} antialiased`}>
+    <html lang="en">
+      <body className={` ${fontParagraph} antialiased`}>
+            <AuthorizedContextProvider>
+        <SessionProviderWrapper>
           <ToastProvider>
-            {children}
-            </ToastProvider>
-        </body>
-      </html>
-    </SessionProviderWrapper>
+              {children}
+          </ToastProvider>
+        </SessionProviderWrapper>
+              </AuthorizedContextProvider>
+      </body>
+    </html>
   );
 }

@@ -17,9 +17,9 @@ export default function RootLayout({
     <SidebarProvider>
       <div className="flex min-h-screen mx-auto">
         <DashboardSidebar />
-        <main className="flex-1 p-4 md:p-6 mx-auto container">
-            {children}
-            <Toaster />
+        <main className="flex-1 p-4 md:p-6 ">
+          {children}
+          <Toaster />
         </main>
       </div>
     </SidebarProvider>

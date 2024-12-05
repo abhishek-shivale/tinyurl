@@ -9,6 +9,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Loader from '@/components/loader/loader';
 import { EyeClosedIcon } from 'lucide-react';
+import { useAuthorizedContext } from '@/hooks/use-authorise';
 
 const initialState = {
   email: '',
@@ -20,6 +21,8 @@ const initialState = {
 
 function Form() {
   const [state, setState] = React.useState(initialState);
+  const auth = useAuthorizedContext();
+
 
   const router = useRouter();
 
@@ -43,6 +46,7 @@ function Form() {
     });
     setState({ ...state, loading: false });
     if (res?.ok === false) return alert('something went wrong');
+    await auth.revalidateUserInfo()
     if (res?.ok === true) return router.push('/');
   };
 
