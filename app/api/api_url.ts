@@ -240,7 +240,7 @@ export const editShortUrl = async (data: editShortUrl) => {
         id: data.id,
       },
       data: {
-        password: '',
+        password: "",
       },
     });
   }
@@ -248,3 +248,103 @@ export const editShortUrl = async (data: editShortUrl) => {
   revalidatePath("/dashboard");
   return true;
 };
+
+export const getAnalytics = async () => {
+  const userId = await checkUser();
+  if (!userId) throw new Error("Unauthorized");
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - 6 + i);
+    return {
+      date: date.toLocaleString("en-US", { weekday: "short" }),
+      fullDate: date,
+    };
+  });
+
+  const dailyPerformance = await Promise.all(
+    days.map(async (day) => {
+      const clicksCount = await prisma.shortUrl.aggregate({
+        where: {
+          userId: userId as string,
+          lastClickedAt: {
+            gte: new Date(day.fullDate.setHours(0, 0, 0, 0)),
+            lt: new Date(day.fullDate.setHours(23, 59, 59, 999)),
+          },
+        },
+        _sum: {
+          clicks: true,
+        },
+      });
+
+      return {
+        date: day.date,
+        clicks: clicksCount._sum.clicks || 0,
+      };
+    })
+  );
+
+  const topLinks = await prisma.shortUrl.findMany({
+    where: {
+      userId: userId as string,
+      lastClickedAt: {
+        gte: sevenDaysAgo,
+      },
+    },
+    orderBy: {
+      clicks: "desc",
+    },
+    take: 3,
+    select: {
+      originalUrl: true,
+      clicks: true,
+    },
+  });
+
+  const formattedTopLinks = topLinks.map((link) => ({
+    title: link.originalUrl.split("/")[2] || "Unnamed Link",
+    url: link.originalUrl,
+    clicks: link.clicks,
+  }));
+
+  const totalAnalytics = await prisma.shortUrl.aggregate({
+    where: {
+      userId: userId as string,
+    },
+    _sum: {
+      clicks: true,
+    },
+    _count: {
+      id: true,
+    },
+  });
+
+  return {
+    dailyPerformance,
+    topLinks: formattedTopLinks,
+    totalClicks: totalAnalytics._sum.clicks || 0,
+    totalUrls: totalAnalytics._count.id || 0,
+  };
+};
+
+
+export const getTopUrls = async () => {
+  const userId = await checkUser();
+  if (!userId) throw new Error("Unauthorized");
+  const topUrls = await prisma.shortUrl.findMany({
+    where: {
+      userId: userId as string,
+    },
+    orderBy: {
+      clicks: "desc",
+    },
+    take: 3,
+    select: {
+      originalUrl: true,
+      clicks: true,
+    },
+  });
+  return topUrls;
+}

@@ -10,7 +10,7 @@ function Clipboard({ link }: { link: string }) {
       toast({ title: "No URL to copy.", variant: "destructive" });
       return;
     }
-    const shortUrl = `${window.location.origin}/${link}`;
+    const shortUrl = `${window.location.origin}/t/${link}`;
     navigator.clipboard.writeText(shortUrl).then(
       () => {
         toast({

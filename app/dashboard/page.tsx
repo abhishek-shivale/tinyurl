@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { fontHeading } from "../font";
 import ShortLinkDialog from "./_components/shortlinkdialog";
 import ShortLinkTable from "./_components/table";
+import Tableskeleton from "./_components/tableskeleton";
 
 export default function LinksDashboard() {
   return (
@@ -11,15 +12,15 @@ export default function LinksDashboard() {
         <h1
           className={`${fontHeading} text-3xl font-bold flex items-center gap-3`}
         >
-          <LinkIcon className="text-blue-600" />
+          <LinkIcon className="text-black" />
           Your Links
         </h1>
         <ShortLinkDialog />
       </div>
 
       {/* <FilterSection /> */}
-      <div className="bg-white shadow rounded-lg overflow-hidden ">
-        <Suspense fallback={<div>Loading...</div>}>
+      <div className=" border shadow rounded-lg overflow-hidden border-[rgb(238,228,226)] ">
+        <Suspense fallback={<Tableskeleton />}>
           <ShortLinkTable />
         </Suspense>
       </div>

@@ -24,53 +24,54 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 async function ShortLinkTable() {
   const links = await getShortUrl();
 
   return (
-    <table className="w-full table-fixed">
-      <thead className="bg-gray-50 border-b">
-        <tr>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+    <Table className="w-full table-fixed ">
+      <TableHeader className="bg-gray-50 ">
+        <TableRow className=" border border-[rgb(238,228,226)]">
+          <TableHead className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider w-1/4">
             Original Link
-          </th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+          </TableHead>
+          <TableHead className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider w-1/4">
             Short Link
-          </th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+          </TableHead>
+          <TableHead className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider w-1/6">
             Clicks
-          </th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+          </TableHead>
+          <TableHead className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider w-1/6">
             Created
-          </th>
-          <th className=" py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+          </TableHead>
+          <TableHead className=" py-3 text-left text-xs font-medium text-black uppercase tracking-wider w-1/6">
             Protected
-          </th>
-          <th className="px-8 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+          </TableHead>
+          <TableHead className="px-8 py-3 text-right text-xs font-medium text-black uppercase tracking-wider w-1/6">
             Actions
-          </th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-gray-200">
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody className="divide-y divide-gray-200">
         {links.length === 0 ? (
-          <tr>
-            <td colSpan={5} className="px-6 py-10 text-center text-gray-500">
+          <TableRow>
+            <TableCell colSpan={5} className="px-6 py-10 text-center text-gray-500">
               No links found
-            </td>
-          </tr>
+            </TableCell>
+          </TableRow>
         ) : (
           links.map((link) => (
-            <tr key={link.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-4">
+            <TableRow key={link.id} className="hover:bg-gray-50 transition-colors">
+              <TableCell className="px-6 py-4">
                 <div className="text-sm text-gray-900 truncate max-w-xs">
                   {link.originalUrl}
                 </div>
-              </td>
-              <td className="px-6 py-4">
+              </TableCell>
+              <TableCell className="px-6 py-4">
                 <div className="flex items-center gap-2">
                   <a
-                    href={`${process.env.NEXTAUTH_URL}/${link.slug}`}
+                    href={`${process.env.NEXTAUTH_URL}/t/${link.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline"
@@ -79,20 +80,20 @@ async function ShortLinkTable() {
                   </a>
                   <Clipboard link={link.slug} />
                 </div>
-              </td>
-              <td className="px-6 py-4">
+              </TableCell>
+              <TableCell className="px-6 py-4">
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <BarChart2 size={16} />
                   {link.clicks}
                 </div>
-              </td>
+              </TableCell>
               <td
                 className="px-6 py-4 text-sm text-gray-500"
                 title={new Date(link.createdAt).toLocaleDateString()}
               >
                 {getRelativeDate(link.createdAt)}
               </td>
-              <td className="px-4 py-4 text-sm text-gray-500">
+              <TableCell className="px-4 py-4 text-sm text-gray-500">
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   {link.isProtected ? (
                     <div title="Protected">
@@ -104,8 +105,8 @@ async function ShortLinkTable() {
                     </div>
                   )}
                 </div>
-              </td>
-              <td className="px-6 py-4 text-right">
+              </TableCell>
+              <TableCell className="px-6 py-4 text-right">
                 <div className="flex justify-end items-center gap-2">
                   <Qrdialog value={`${link.slug}`} />
 
@@ -166,12 +167,12 @@ async function ShortLinkTable() {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))
         )}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 }
 

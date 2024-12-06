@@ -25,8 +25,8 @@ export const Qrdialog = ({ value }: { value: string }) => {
           </DialogTitle>
         </div>
         <div className="flex flex-col items-center gap-4 mt-4">
-          <div className="p-4 bg-gray-50 rounded-md border border-gray-200">
-            <QRCodeSVG value={`${process.env.NEXTAUTH_URL}/${value}`} />
+          <div className="p-4 bg-gray-50 rounded-md border border-[rgb(238,228,226)]">
+            <QRCodeSVG value={`${process.env.NEXTAUTH_URL}/t/${value}`} />
           </div>
           <p className="text-sm text-gray-500 text-center">
             Scan this QR code to view details.

@@ -1,5 +1,4 @@
 "use client";
-
 import { UrlFormData, urlFormSchema } from "@/lib/lib";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -87,7 +86,7 @@ function TinyLinkForm() {
         return;
       }
 
-      const shortUrl = `${window.location.origin}/${response.shortUrl.slug}`;
+      const shortUrl = `${window.location.origin}/t/${response.shortUrl.slug}`;
       setState((prev) => ({
         ...prev,
         shortUrl,

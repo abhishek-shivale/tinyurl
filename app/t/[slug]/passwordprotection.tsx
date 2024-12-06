@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Lock } from "lucide-react";
 import { checkPassword } from "@/app/api/api_url";
 import { useToast } from "@/hooks/use-toast";
-import { fontHeading } from "../font";
+import { fontHeading } from "../../font";
 import { Toast } from "@/components/ui/toast";
 
 const initialState = {

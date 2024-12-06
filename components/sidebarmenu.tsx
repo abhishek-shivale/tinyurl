@@ -36,8 +36,8 @@ function Sidebarmenu() {
           group transition-all duration-300 ease-in-out
           ${
             pathname === item.url
-              ? "bg-blue-50 text-blue-600"
-              : "hover:bg-gray-100 text-gray-600 hover:text-gray-800"
+              ? "bg-blue-50 text-blue-600 hover:text-blue-600"
+              : "text-gray-800 "
           }
           rounded-lg mx-3
         `}
@@ -45,14 +45,18 @@ function Sidebarmenu() {
           <SidebarMenuButton asChild>
             <Link
               href={item.url}
-              className="flex items-center gap-3 p-3 w-full"
+              className={`flex items-center gap-3 p-3 w-full ${
+                pathname === item.url
+                  ? "bg-blue-100 hover:bg-blue-100 "
+                  : "hover:bg-gray-300/50"
+              }`}
             >
               <item.icon
                 className={`
                 ${
                   pathname === item.url
-                    ? "text-blue-600"
-                    : "text-gray-400 group-hover:text-gray-600"
+                    ? "text-blue-600 hover:text-blue-600"
+                    : "text-gray-600"
                 }
                 transition-colors duration-300
               `}
@@ -87,12 +91,12 @@ export const UserContent = () => {
 };
 
 const FreeUserContent = ({ shortUrlsCount }: { shortUrlsCount: number }) => {
-  const maxLimit = 15; // Example limit for free users
+  const maxLimit = 15;
   const progressPercentage = Math.min((shortUrlsCount / maxLimit) * 100, 100);
 
   return (
     <>
-      <div className="flex justify-center mb-2">
+      <div className="flex justify-center mb-2 bg-ta">
         <Crown className="text-yellow-500" size={32} />
       </div>
       <p className="text-sm text-gray-700 mb-2">
@@ -104,14 +108,14 @@ const FreeUserContent = ({ shortUrlsCount }: { shortUrlsCount: number }) => {
       </p>
       <div className="w-full bg-gray-300 rounded-full h-2.5 mb-2">
         <div
-          className="bg-blue-600 h-2.5 rounded-full transition-all"
+          className="bg-black h-2.5 rounded-full transition-all"
           style={{ width: `${progressPercentage}%` }}
         ></div>
       </div>
       <p className="text-xs text-gray-500 mb-3">
         Upgrade to create more links and unlock premium features
       </p>
-      <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
+      <button className="w-full bg-gray-900 text-white py-2 rounded-md hover:bg-gray-900 transition-colors">
         Go Pro
       </button>
     </>
@@ -124,7 +128,7 @@ const PremiumUserContent = () => (
       <Crown className="text-yellow-500" size={32} />
     </div>
     <p className="text-sm text-gray-700 mb-2">
-      <span className="font-bold text-blue-600">Unlimited Links</span> at your
+      <span className="font-bold text-blue-600 tracking-wide">Unlimited Links</span> at your
       disposal!
     </p>
     <p className="text-xs text-gray-500 mb-3">Enjoy all the premium benefits!</p>

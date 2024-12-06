@@ -1,147 +1,186 @@
 "use client";
-import React, { useState } from 'react';
+import { fontHeading } from "@/app/font";
 import {
-  ChevronRight,
-  Settings as SettingsIcon,
-  Link,
-  Globe,
-  Rocket,
-  CreditCard,
-  Users
-} from 'lucide-react';
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "@/hooks/use-toast";
+import {
+  BellIcon,
+  CreditCardIcon,
+  LockIcon,
+  SettingsIcon,
+  UserIcon,
+} from "lucide-react";
+import { useState } from "react";
+import Billing from "./_components/billing";
+import Profileupdate from "./_components/profileupdate";
+import Settings from "./_components/settings";
 
 const SettingsPage = () => {
-  const [activeSection, setActiveSection] = useState('general');
+  const [notifications, setNotifications] = useState({
+    email: true,
+    push: false,
+    sms: false,
+    marketing: false,
+  });
 
-  const settingsSections = [
-    {
-      id: 'general',
-      icon: <SettingsIcon className="w-5 h-5" />,
-      title: 'General Settings',
-      description: 'Manage your account preferences'
-    },
-    {
-      id: 'domains',
-      icon: <Globe className="w-5 h-5" />,
-      title: 'Domains',
-      description: 'Custom domains for your links'
-    },
-    {
-      id: 'links',
-      icon: <Link className="w-5 h-5" />,
-      title: 'Links',
-      description: 'Manage and track your shortened links'
-    },
-    {
-      id: 'upgrade',
-      icon: <Rocket className="w-5 h-5" />,
-      title: 'Upgrade',
-      description: 'Unlock pro features'
-    },
-    {
-      id: 'billing',
-      icon: <CreditCard className="w-5 h-5" />,
-      title: 'Billing',
-      description: 'Manage your subscription'
-    },
-    {
-      id: 'team',
-      icon: <Users className="w-5 h-5" />,
-      title: 'Team',
-      description: 'Invite and manage team members'
-    }
-  ];
+  // const [subscription, _] = useState({
+  //   plan: "Pro Plan",
+  //   nextBillingDate: "July 15, 2024",
+  //   storageUsage: 65,
+  // });
 
-  const renderContent = () => {
-    switch(activeSection) {
-      case 'general':
-        return (
-          <div className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">General Settings</h2>
-            <div className="space-y-4">
-              <div className="bg-white border rounded-lg p-4">
-                <h3 className="font-medium mb-2">Profile Information</h3>
-                <div className="flex items-center justify-between">
-                  <p className="text-gray-600">Update your personal details</p>
-                  <button className="text-blue-500 hover:underline">
-                    Edit Profile
-                  </button>
-                </div>
-              </div>
-              <div className="bg-white border rounded-lg p-4">
-                <h3 className="font-medium mb-2">Preferences</h3>
-                <div className="flex items-center justify-between">
-                  <p className="text-gray-600">Customize your experience</p>
-                  <button className="text-blue-500 hover:underline">
-                    Manage Preferences
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      case 'domains':
-        return (
-          <div className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Domains</h2>
-            <div className="bg-white border rounded-lg p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-medium">Custom Domains</h3>
-                <button className="text-blue-500 hover:underline">
-                  Add Domain
-                </button>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center border-b pb-2">
-                  <span>dub.sh</span>
-                  <span className="text-green-500">Verified</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>yourdomain.com</span>
-                  <span className="text-yellow-500">Pending</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      default:
-        return <div className="p-6">Select a section</div>;
-    }
+
+
+  const handleNotificationToggle = (key: keyof typeof notifications) => {
+    setNotifications((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+    toast({
+      title: "Notification Settings",
+      description: `${
+        key.charAt(0).toUpperCase() + key.slice(1)
+      } notifications ${notifications[key] ? "disabled" : "enabled"}.`,
+      variant: "default",
+    });
   };
 
   return (
-    <div className="flex bg-gray-50 min-h-screen">
-      {/* Sidebar */}
-      <div className="w-80 bg-white border-r p-6">
-        <h1 className="text-2xl font-bold mb-8">Settings</h1>
-        <div className="space-y-2">
-          {settingsSections.map((section) => (
-            <button
-              key={section.id}
-              className={`w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 transition ${
-                activeSection === section.id
-                  ? 'bg-blue-50 text-blue-600'
-                  : 'text-gray-600'
-              }`}
-              onClick={() => setActiveSection(section.id)}
-            >
-              <div className="flex items-center space-x-3">
-                {section.icon}
-                <div className="text-left">
-                  <p className="font-medium">{section.title}</p>
-                  <p className="text-xs text-gray-500">{section.description}</p>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          ))}
-        </div>
+    <div className="container mx-auto px-4 py-8 md:w-[100vh]  space-y-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1
+          className={`${fontHeading} text-3xl font-bold flex items-center gap-3`}
+        >
+          <SettingsIcon color="black" />
+          Settings
+        </h1>
       </div>
+      <Card className="w-full ">
+        <CardHeader>
+          <CardTitle className="flex items-center tracking-wider">
+            <UserIcon className="mr-3 text-black" />
+            Profile Settings
+          </CardTitle>
+          <CardDescription>Update your personal information</CardDescription>
+        </CardHeader>
+        <Profileupdate />
+      </Card>
 
-      {/* Content Area */}
-      <div className="flex-grow">
-        {renderContent()}
-      </div>
+      {/* Notifications Section */}
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center tracking-wider">
+            <BellIcon className="mr-3 text-black" />
+            Notification Preferences
+          </CardTitle>
+          <CardDescription>
+            Choose how you want to receive updates
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {[
+            {
+              key: "email",
+              label: "Email Notifications",
+              description: "Receive email updates about your account",
+            },
+            {
+              key: "push",
+              label: "Push Notifications",
+              description: "Get instant alerts on your devices",
+            },
+            {
+              key: "sms",
+              label: "SMS Notifications",
+              description: "Receive text message updates",
+            },
+            {
+              key: "marketing",
+              label: "Marketing Communications",
+              description: "Opt-in to promotional emails and offers",
+            },
+          ].map(({ key, label, description }) => (
+            <div key={key} className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold">{label}</h3>
+                <p className="text-sm text-muted-foreground">{description}</p>
+              </div>
+              <Switch
+                checked={notifications[key as keyof {
+                  email: true,
+                  push: false,
+                  sms: false,
+                  marketing: false,
+                }]}
+                onCheckedChange={() => handleNotificationToggle(key as keyof {
+                  email: true,
+                  push: false,
+                  sms: false,
+                  marketing: false,
+                })}
+              />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <CreditCardIcon className="mr-3 text-black" />
+            Subscription Details
+          </CardTitle>
+          <CardDescription>
+            Manage your current plan and billing information
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="font-semibold text-blue-800">
+                  {subscription.plan}
+                </h3>
+                <p className="text-blue-700 text-sm">
+                  Next billing date: {subscription.nextBillingDate}
+                </p>
+              </div>
+              <Button variant="outline">Change Plan</Button>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-2">Storage Usage</h3>
+            <Progress value={subscription.storageUsage} className="w-full" />
+            <p className="text-sm text-muted-foreground mt-2">
+              {subscription.storageUsage}% of storage used
+            </p>
+          </div> */}
+
+          <div className="space-y-4">
+            <Billing />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <LockIcon className="mr-3 text-black" />
+            Account Security
+          </CardTitle>
+          <CardDescription>
+            Protect your account with advanced security settings
+          </CardDescription>
+        </CardHeader>
+        <Settings />
+      </Card>
     </div>
   );
 };

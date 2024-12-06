@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen mx-auto">
+      <div className="flex min-h-screen mx-auto  tracking-wide">
         <DashboardSidebar />
         <main className="flex-1 p-4 md:p-6 ">
           {children}

@@ -18,13 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={` ${fontParagraph} antialiased`}>
-            <AuthorizedContextProvider>
-        <SessionProviderWrapper>
-          <ToastProvider>
-              {children}
-          </ToastProvider>
-        </SessionProviderWrapper>
-              </AuthorizedContextProvider>
+        <AuthorizedContextProvider>
+          <SessionProviderWrapper>
+            <ToastProvider>{children}</ToastProvider>
+          </SessionProviderWrapper>
+        </AuthorizedContextProvider>
       </body>
     </html>
   );

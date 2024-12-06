@@ -17,13 +17,13 @@ export default function DashboardSidebar() {
     <>
       <Sidebar
         variant="sidebar"
-        className="bg-gray-50 h-screen w-64 shadow-lg border-r border-gray-200 flex flex-col"
+        className="bg-gray-50 h-screen w-64 shadow-lg border-r border-[rgb(238,228,226)] flex flex-col"
       >
         <SidebarContent className="py-6 flex-grow">
           <SidebarGroup>
             <SidebarGroupLabel className="mb-6">
-              <span className="flex items-center justify-center text-xl font-bold text-gray-800 gap-2">
-                <LinkIcon className="text-blue-600" size={24} />
+              <span className="flex items-center justify-center text-xl font-bold text-gray-900 gap-2">
+                <LinkIcon className="text-black" size={24} />
                 <span className={`${fontHeading} tracking-wider text-2xl	`}>
                   TinyUrl
                 </span>
@@ -35,7 +35,7 @@ export default function DashboardSidebar() {
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className="p-4 border-t border-gray-200 bg-white">
+        <SidebarFooter className="p-4  bg-[rgb(238,228,226)]">
           <div className="bg-blue-50 rounded-lg p-4 text-center relative overflow-hidden">
             <div className="relative z-10">
               <UserContent />

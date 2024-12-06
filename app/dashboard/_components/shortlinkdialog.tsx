@@ -165,7 +165,7 @@ function ShortLinkDialog() {
         return;
       }
 
-      const shortUrl = `${window.location.origin}/${response.shortUrl.slug}`;
+      const shortUrl = `${window.location.origin}/t/${response.shortUrl.slug}`;
       setState((prev) => ({
         ...prev,
         shortUrl,
@@ -225,7 +225,7 @@ function ShortLinkDialog() {
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2 border-[rgb(238,228,226)]">
           <Plus className="h-4 w-4" />
           Create Short Link
         </Button>

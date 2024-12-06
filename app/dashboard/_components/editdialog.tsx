@@ -200,7 +200,7 @@ export const EditDialog = ({
         <Label>Full Short Link Preview</Label>
         <div className="flex gap-2 items-center py-2">
           <Input
-            value={`${window.location.origin}/${customSlug}`}
+            value={`${window.location.origin}/t/${customSlug}`}
             readOnly
             className="flex-1 focus:ring-2 focus:ring-primary/50 break-all"
           />
@@ -241,7 +241,7 @@ export const EditDialog = ({
       <div className="flex justify-center">
         <QRCodeSVG
           size={128}
-          value={`${window.location.origin}/${customSlug}`}
+          value={`${window.location.origin}/t/${customSlug}`}
         />
       </div>
 
