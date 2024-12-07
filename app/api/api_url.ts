@@ -286,49 +286,10 @@ export const getAnalytics = async () => {
     })
   );
 
-  const topLinks = await prisma.shortUrl.findMany({
-    where: {
-      userId: userId as string,
-      lastClickedAt: {
-        gte: sevenDaysAgo,
-      },
-    },
-    orderBy: {
-      clicks: "desc",
-    },
-    take: 3,
-    select: {
-      originalUrl: true,
-      clicks: true,
-    },
-  });
-
-  const formattedTopLinks = topLinks.map((link) => ({
-    title: link.originalUrl.split("/")[2] || "Unnamed Link",
-    url: link.originalUrl,
-    clicks: link.clicks,
-  }));
-
-  const totalAnalytics = await prisma.shortUrl.aggregate({
-    where: {
-      userId: userId as string,
-    },
-    _sum: {
-      clicks: true,
-    },
-    _count: {
-      id: true,
-    },
-  });
-
   return {
     dailyPerformance,
-    topLinks: formattedTopLinks,
-    totalClicks: totalAnalytics._sum.clicks || 0,
-    totalUrls: totalAnalytics._count.id || 0,
   };
 };
-
 
 export const getTopUrls = async () => {
   const userId = await checkUser();
@@ -347,4 +308,4 @@ export const getTopUrls = async () => {
     },
   });
   return topUrls;
-}
+};

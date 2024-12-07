@@ -2,6 +2,8 @@
 import React, { createContext, useEffect, useState } from "react";
 import { getUserInfo } from "@/app/api/api_user";
 import { toast } from "@/hooks/use-toast";
+import {signOut} from "next-auth/react"
+import { useRouter } from "next/navigation";
 
 interface AuthorizedContext {
   email: string;
@@ -33,6 +35,7 @@ function AuthorizedContextProvider({
   children: React.ReactNode;
 }) {
   const [info, setInfo] = useState<AuthorizedContext | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
@@ -72,8 +75,10 @@ function AuthorizedContextProvider({
     }
   };
 
-  const clearUserInfo = () => {
+  const clearUserInfo = async () => {
     localStorage.removeItem("userInfo");
+    await signOut();
+    router.push("/");
     setInfo(null);
   };
 

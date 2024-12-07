@@ -1,5 +1,5 @@
 import { getTopUrls } from "@/app/api/api_url";
-import { Download, Link2 } from "lucide-react";
+import { Link2 } from "lucide-react";
 
 async function Rendertopurls() {
   const topUrls = await getTopUrls();
@@ -8,9 +8,9 @@ async function Rendertopurls() {
     <div className="bg-white rounded-lg shadow-md p-4 md:p-6 mt-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 space-y-2 md:space-y-0">
         <h2 className="text-xl font-semibold">Top Performing URLs</h2>
-        <button className="text-blue-500 hover:bg-blue-50 p-2 rounded-full transition-colors">
+        {/* <button className="text-blue-500 hover:bg-blue-50 p-2 rounded-full transition-colors">
           <Download size={20} />
-        </button>
+        </button> */}
       </div>
       <div className="space-y-4">
         {topUrls.map((urlData, index) => (
@@ -20,15 +20,15 @@ async function Rendertopurls() {
           >
             <div className="flex items-center space-x-4 mb-2 md:mb-0 w-full md:w-auto">
               <div className="bg-blue-100 p-2 rounded-full">
-                <Link2 className="text-blue-500" size={20} />
+                <Link2 className="text-black" size={20} />
               </div>
               <div className="flex-grow overflow-hidden">
-                <h3 className="font-semibold text-gray-800 truncate">
+                {/* <p className="font-semibold text-gray-800 truncate">
                   {urlData.originalUrl}
-                </h3>
-                {/* <p className="text-sm text-gray-500 truncate max-w-full">
-                  {urlData.url}
                 </p> */}
+                <p className=" text-gray-500 truncate max-w-full">
+                  {urlData.originalUrl}
+                </p>
               </div>
             </div>
             <div className="text-right w-full md:w-auto">

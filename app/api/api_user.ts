@@ -109,3 +109,24 @@ export async function updateProfile(data: updateProfile) {
 
   return { message: "Profile updated successfully", success: true };
 }
+
+export const UpgradeSubscription = async () => {
+  const userId = (await headers()).get("x-userid");
+  if (!userId) throw new Error("Unauthorized");
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      role: "PREMIUM",
+    },
+  });
+  return { message: "Plan upgraded successfully", success: true };
+};
+
+export const deleteAccount = async () => {
+  const userId = (await headers()).get("x-userid");
+  if (!userId) throw new Error("Unauthorized");
+  await prisma.user.delete({
+    where: { id: userId },
+  });
+  return { message: "Account deleted successfully", success: true };
+};

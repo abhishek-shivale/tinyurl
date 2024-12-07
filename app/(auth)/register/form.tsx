@@ -8,8 +8,9 @@ import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Loader from '@/components/loader/loader';
-import { EyeClosedIcon } from 'lucide-react';
+import { EyeClosedIcon, Link2 } from 'lucide-react';
 import { useAuthorizedContext } from '@/hooks/use-authorise';
+import { fontHeading } from '@/app/font';
 
 const initialState = {
   email: '',
@@ -53,8 +54,10 @@ function Form() {
   return (
     <div className='z-50 w-full max-w-[400px] space-y-6 px-6 py-8'>
       <div className='flex justify-center'>
-        <MountainIcon className='h-8 w-8' />
-        <span className='sr-only'>Acme Inc</span>
+      <Link href='/' className='flex justify-center items-center gap-2'>
+        <Link2 className='h-8 w-8' />
+        <h2 className={`text-black font-bold text-4xl tracking-wide ${fontHeading}`}>TinyLink</h2>
+      </Link>
       </div>
       <div className='space-y-4'>
         <div className='grid gap-2'>
@@ -197,25 +200,6 @@ function EyeIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
     >
       <path d='M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z' />
       <circle cx='12' cy='12' r='3' />
-    </svg>
-  );
-}
-
-function MountainIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
-  return (
-    <svg
-      {...props}
-      xmlns='http://www.w3.org/2000/svg'
-      width='24'
-      height='24'
-      viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    >
-      <path d='m8 3 4 8 5-5 5 15H2L8 3z' />
     </svg>
   );
 }

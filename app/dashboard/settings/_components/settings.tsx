@@ -18,9 +18,11 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { TrashIcon, EyeIcon, EyeClosedIcon } from "lucide-react";
 import Loader from "@/components/loader/loader";
-import { updatePassword } from "@/app/api/api_user";
+import { deleteAccount, updatePassword } from "@/app/api/api_user";
+import { useAuthorizedContext } from "@/hooks/use-authorise";
 
 function Settings() {
+  const userInfo = useAuthorizedContext()
   const [password, setPassword] = useState({
     current: "",
     new: "",
@@ -102,6 +104,27 @@ function Settings() {
         current: "",
         new: "",
         confirm: "",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handeleDelete = async () => {
+    setLoading(true);
+    try {
+      await deleteAccount();
+      userInfo?.clearUserInfo()
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been deleted.",
+        variant: "success",
       });
     } catch (error) {
       toast({
@@ -199,7 +222,7 @@ function Settings() {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction className="bg-red-500 hover:bg-red-600">Continue</AlertDialogAction>
+              <AlertDialogAction className="bg-red-500 hover:bg-red-600" onClick={handeleDelete}>Continue</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
