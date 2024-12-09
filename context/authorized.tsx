@@ -57,6 +57,7 @@ function AuthorizedContextProvider({
         setInfo(userInfo);
         return true;
       }
+      // await signOut();
       toast({
         title: "Failed to fetch user information",
         description: "User not found",

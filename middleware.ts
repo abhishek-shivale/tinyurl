@@ -10,7 +10,8 @@ export async function middleware(req: NextRequest) {
 
   const path = req.nextUrl.pathname;
 
-  if (publicPaths.includes(path) && token) {
+
+  if (publicPaths.includes(path) && token?.id) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
@@ -18,7 +19,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (token) {
+  if (token?.id) {
     const headers = new Headers(req.headers);
     headers.set("x-userid", token.id as string);
 

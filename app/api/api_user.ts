@@ -130,3 +130,15 @@ export const deleteAccount = async () => {
   });
   return { message: "Account deleted successfully", success: true };
 };
+
+
+export const getUserInfoCheck = async (email: string) =>
+  {
+    const user = await prisma.user.findUnique({
+      where: { email: email },});
+
+    if (!user) {
+      return false;
+    }
+    return true;
+  }
