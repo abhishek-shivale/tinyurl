@@ -48,7 +48,7 @@ function Form() {
     setState({ ...state, loading: false });
     if (res?.ok === false) return alert('something went wrong');
     await auth.revalidateUserInfo()
-    if (res?.ok === true) return router.push('/');
+    if (res?.ok === true) return router.push('/dashboard');
   };
 
   return (
